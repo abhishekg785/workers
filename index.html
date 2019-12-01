@@ -1,6 +1,15 @@
 <html>
     <head>
         <title>Without woker</title>
+        <style>
+            .x {
+                height: 40px;
+                width: 40px;
+                background: red;
+                border-radius: 50%;
+                position: absolute;
+            }
+        </style>
     </head>
     <body>
         <div class="x"></div>
@@ -15,22 +24,35 @@
             if (e.data == "compute") {
                 pause(1000);
 
-                self.postMessage('compute done');
+                self.postMessage('done');
             }
         });
     </script>
     <script>
+        // function pause(ms) {
+        //     const time = new Date();
+        //     while((new Date()) - time < ms) {}
+        // }
+
         const workerjs = document.getElementById('workerjs');
         const blob = new Blob([workerjs.innerText]);
         const blobUrl = window.URL.createObjectURL(blob);
+
         // create a new worker
         const worker = new Worker(blobUrl);
-        worker.postMessage("compute")
 
         worker.addEventListener('message', (e) => {
-            console.log('message from worker', e);
+            if (e.data == 'done') {
+                console.log('computation done');
+            }
         });
 
-        document.getElementsByClassName('x')[0].innerHTML = "hello";
+        // document.getElementsByClassName('x')[0].innerHTML = "hello";
+        document.addEventListener('mousemove', (e) => {
+            const x = document.getElementsByClassName('x')[0];
+            x.style.left = String(e.clientX);
+            x.style.top = String(e.clientY);
+            worker.postMessage('compute');
+        });
     </script>
 </html>
