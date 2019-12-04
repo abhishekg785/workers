@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <title>fib</title>
+    </head>
+    <body>
+        <button onclick="stopWorker()">Stop</button>
+        <div id="view"></div>
+    </body>
+    <script id="workerjs" type"text/plain">
+        let c = 0;
+
+        self.addEventListener('message', (e) => {
+            generate();
+        });
+
+        function generate() {
+            let result = fibannoci(c);
+            self.postMessage(result);
+            c++;
+
+            setTimeout(generate, 0);
+        }
+
+        function fibannoci(n) {
+            if (n < 2) return n;
+
+            return fibannoci(n-2) + fibannoci(n-1);
+        }
+    </script>
+    <script>
+        const view = document.getElementById('view');
+
+        const workerjs = document.getElementById('workerjs').innerText;
+        const blob = new Blob([workerjs]);
+        const workerurl = window.URL.createObjectURL(blob);
+        const worker = new Worker(workerurl);
+
+        worker.postMessage(3);
+
+        worker.addEventListener('message', (e) => {
+            view.innerHTML += `${e.data}<br/>`
+            console.log('result is', e.data);
+        })
+
+        function stopWorker() {
+            worker.terminate();
+        }
+    </script>
+</html>
